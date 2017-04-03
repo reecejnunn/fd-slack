@@ -1,9 +1,9 @@
 
 def populate_all_users
 	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
-	all_users = $redis.smembers( all_users_key )
+	all_users = $redis.hgetall( all_users_key )
 	logger.debug "populate_all_users. all_users (#{all_users_key}) = #{all_users.inspect}"
-	if all_users.nil? || all_users == "" || all_users == []
+	if all_users.nil? || all_users == "" || all_users == {}
 		channel_info = Slack.channels_info( :channel => params['channel_id'] )
 
 		if channel_info['ok']
@@ -39,14 +39,11 @@ def populate_all_users
 			end
 		end
 
-		all_users = $redis.smembers( all_users_key )
+		all_users = $redis.hgetall( all_users_key )
 		logger.debug "about to set all_users, assuming it's still empty? #{all_users.inspect}"
-		if all_users.nil? || all_users == "" || all_users == []
+		if all_users.nil? || all_users == "" || all_users == {}
 			logger.debug "For each user in #{all_users_local.inspect}"
-			all_users_local.each do |user|
-				logger.debug "Adding #{user.inspect} to #{all_users_key}"
-				$redis.sadd( all_users_key, user )
-			end
+			$redis.hset( all_users_key, all_users_local )
 			logger.debug "all_users populated: #{all_users.inspect}"
 
 			logger.debug "Setting expiry on #{all_users_key} to 30m"
@@ -64,7 +61,7 @@ def standup_participants
 	$standup_participants_skipped = []
 
 	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
-	all_users = $redis.smembers( all_users_key )
+	all_users = $redis.hgetall( all_users_key )
 
 	# Extract just the usernames
 # 	$all_users.sort! do |a,b|

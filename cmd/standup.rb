@@ -1,6 +1,7 @@
 
 def populate_all_users
-	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
+	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
+	all_users_key = "#{standup_key}:all_users"
 	all_users = $redis.get( all_users_key )
 	logger.debug "populate_all_users. all_users (#{all_users_key}) = #{all_users.inspect}"
 	if all_users.nil? || all_users == "" || all_users == {}
@@ -59,7 +60,8 @@ def standup_participants
 	$standup_participants = []
 	$standup_participants_skipped = []
 
-	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
+	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
+	all_users_key = "#{standup_key}:all_users"
 	all_users = JSON.parse($redis.get( all_users_key ))
 
 	# Extract just the usernames
@@ -87,7 +89,7 @@ def standup
 		# TODO: allow user to specify sort orders
 		standup_start
 	when "standup clear", "standup reset"
-		$redis.expire( all_users_key, 0 )
+		$redis.del( all_users_key )
 		slack_secret_message "Reset"
 	when "standup done"
 		standup_done
@@ -112,7 +114,7 @@ def standup_done
 	# Let user start the next standup with standup_next, if they wish
 	$standup_over = false
 	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
-	$redis.expire( all_users_key, 0 )
+	$redis.del( all_users_key )
 	message = ":boom: Standup Complete! :boom:"
 
 	unless $standup_participants_skipped.empty?
@@ -226,9 +228,6 @@ def standup_next
 			"And last, but by no means least, #{pt}"
 		]
 		$standup_over = true
-		all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
-		# LAAS-4: commenting this out to see what it puts in the DB
-		# $redis.expire( all_users_key, 1 )
 	end
 
 	slack_message up_next.sample

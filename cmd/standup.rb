@@ -1,7 +1,8 @@
 
-$all_users = []
 def populate_all_users
-	if $all_users.empty?
+	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
+	all_users = $redis.smembers( all_users_key )
+	if all_users.nil? || all_users == ""
 		channel_info = Slack.channels_info( :channel => params['channel_id'] )
 
 		if channel_info['ok']
@@ -36,8 +37,13 @@ def populate_all_users
 				end
 			end
 		end
-		if $all_users.empty?
-			$all_users = all_users_local
+
+		all_users = $redis.smembers( all_users_key )
+		if all_users.nil? || all_users == ""
+			all_users_local.each do |user|
+				$redis.sadd( all_users_key, user )
+			end
+			$redis.expire( all_users_key, 60 * 30 )
 		else
 			fail "Race condition! Somebody else already started populating the standup!"
 		end
@@ -50,20 +56,24 @@ def standup_participants
 	$standup_participants = []
 	$standup_participants_skipped = []
 
+	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
+	all_users = $redis.smembers( all_users_key )
+
 	# Extract just the usernames
 # 	$all_users.sort! do |a,b|
 # 		a['user']['real_name'] <=> b['user']['real_name']
 # 	end
+	all_users.shuffle!
 
-	$all_users.shuffle!
-
-	$all_users.each do |user|
+	all_users.each do |user|
 		$standup_participants.push user['user']
 	end
 
 end
 
 def standup
+	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
+
 	# TODO: allow slack delayed response for more of this
 	case params['text'].chomp
 	when "standup next"
@@ -74,7 +84,7 @@ def standup
 		# TODO: allow user to specify sort orders
 		standup_start
 	when "standup clear", "standup reset"
-		$all_users = []
+		$redis.expire( all_users_key, 1 )
 		slack_secret_message "Reset"
 	when "standup done"
 		standup_done
@@ -98,7 +108,8 @@ $standup_over = false
 def standup_done
 	# Let user start the next standup with standup_next, if they wish
 	$standup_over = false
-	$all_users = []
+	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
+	$redis.expire( all_users_key, 1 )
 	message = ":boom: Standup Complete! :boom:"
 
 	unless $standup_participants_skipped.empty?
@@ -212,7 +223,8 @@ def standup_next
 			"And last, but by no means least, #{pt}"
 		]
 		$standup_over = true
-		$all_users = []
+		all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
+		$redis.expire( all_users_key, 1 )
 	end
 
 	slack_message up_next.sample

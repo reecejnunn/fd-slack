@@ -42,11 +42,15 @@ def populate_all_users
 		all_users = $redis.smembers( all_users_key )
 		logger.debug "about to set all_users, assuming it's still empty? #{all_users.inspect}"
 		if all_users.nil? || all_users == "" || all_users == []
+			logger.debug "For each user in #{all_users_local.inspect}"
 			all_users_local.each do |user|
+				logger.debug "Adding #{user.inspect} to #{all_users_key}"
 				$redis.sadd( all_users_key, user )
 			end
-			$redis.expire( all_users_key, 60 * 30 )
 			logger.debug "all_users populated: #{all_users.inspect}"
+
+			logger.debug "Setting expiry on #{all_users_key} to 30m"
+			$redis.expire( all_users_key, 60 * 30 )
 		else
 			fail "Race condition! Somebody else already started populating the standup!"
 		end

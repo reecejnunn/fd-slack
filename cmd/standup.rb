@@ -3,7 +3,7 @@ def populate_all_users
 	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
 	all_users = $redis.smembers( all_users_key )
 	logger.debug "populate_all_users. all_users (#{all_users_key}) = #{all_users.inspect}"
-	if all_users.nil? || all_users == ""
+	if all_users.nil? || all_users == "" || all_users == []
 		channel_info = Slack.channels_info( :channel => params['channel_id'] )
 
 		if channel_info['ok']
@@ -41,7 +41,7 @@ def populate_all_users
 
 		all_users = $redis.smembers( all_users_key )
 		logger.debug "about to set all_users, assuming it's still empty? #{all_users.inspect}"
-		if all_users.nil? || all_users == ""
+		if all_users.nil? || all_users == "" || all_users == []
 			all_users_local.each do |user|
 				$redis.sadd( all_users_key, user )
 			end

@@ -44,7 +44,6 @@ def populate_all_users
 		if all_users.nil? || all_users == "" || all_users == {}
 			logger.debug "For each user in #{all_users_local.inspect}"
 			$redis.set( all_users_key, all_users_local.to_json )
-			logger.debug "all_users populated: #{all_users.inspect}"
 
 			logger.debug "Setting expiry on #{all_users_key} to 30m"
 			$redis.expire( all_users_key, 60 * 30 )
@@ -88,7 +87,7 @@ def standup
 		# TODO: allow user to specify sort orders
 		standup_start
 	when "standup clear", "standup reset"
-		$redis.expire( all_users_key, 1 )
+		$redis.expire( all_users_key, 0 )
 		slack_secret_message "Reset"
 	when "standup done"
 		standup_done
@@ -113,7 +112,7 @@ def standup_done
 	# Let user start the next standup with standup_next, if they wish
 	$standup_over = false
 	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
-	$redis.expire( all_users_key, 1 )
+	$redis.expire( all_users_key, 0 )
 	message = ":boom: Standup Complete! :boom:"
 
 	unless $standup_participants_skipped.empty?
@@ -228,7 +227,8 @@ def standup_next
 		]
 		$standup_over = true
 		all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
-		$redis.expire( all_users_key, 1 )
+		# LAAS-4: commenting this out to see what it puts in the DB
+		# $redis.expire( all_users_key, 1 )
 	end
 
 	slack_message up_next.sample

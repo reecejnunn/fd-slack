@@ -214,10 +214,14 @@ def standup_next
 	end
 
 	# Is the standup already over?
-	standup_participants = JSON.parse($redis.get( participants_key ))
-	logger.debug "participants remaining: #{standup_participants.count}"
-	if standup_participants.empty?
-		return standup_done
+	if ( $redis.get( participants_key ).nil? )
+		return slack_message "No standup currently in progress!\nStart one with `/laas standup start`"
+	else
+		standup_participants = JSON.parse($redis.get( participants_key ))
+		logger.debug "participants remaining: #{standup_participants.count}"
+		if standup_participants.empty?
+			return standup_done
+		end
 	end
 
 	p = standup_participants.shift

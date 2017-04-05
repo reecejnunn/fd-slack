@@ -117,19 +117,11 @@ def standup
 	end
 end
 
-# TODO: REDIS
-$standup_over = false
-
 def standup_done
 	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
 	all_users_key = "#{standup_key}:all_users"
 	participants_key = "#{standup_key}:participants"
 	participants_skipped_key = "#{standup_key}:participants_skipped"
-
-	# Let user start the next standup with standup_next, if they wish
-	# TODO: REDIS
-	$standup_over = false
-	$redis.del( all_users_key )
 	message = ":boom: Standup Complete! :boom:"
 
 	standup_participants_skipped = JSON.parse($redis.get( participants_skipped_key ))
@@ -141,6 +133,10 @@ def standup_done
 			message = message + "#{pt}\n"
 		end
 	end
+
+	$redis.del( all_users_key )
+	$redis.del( participants_key )
+	$redis.del( participants_skipped_key )
 
 	slack_message message
 end
@@ -162,10 +158,6 @@ def standup_start
 		# Get participants of this standup
 		logger.debug "getting standup participants"
 		standup_participants
-
-		# Standup has not finished yet
-		# TODO: REDIS
-		$standup_over = false
 
 		logger.debug "pasting standup participants"
 		standup_participants = JSON.parse($redis.get( participants_key ))
@@ -222,15 +214,10 @@ def standup_next
 	end
 
 	# Is the standup already over?
-	# TODO: REDIS
-	if $standup_over
-		return standup_done
-	end
-
-	# Was this standup started with "standup next"?
 	standup_participants = JSON.parse($redis.get( participants_key ))
+	logger.debug "participants remaining: #{standup_participants.count}"
 	if standup_participants.empty?
-		return standup_start
+		return standup_done
 	end
 
 	p = standup_participants.shift
@@ -267,8 +254,6 @@ def standup_next
 			"And for our grand finale, #{pt}!",
 			"And last, but by no means least, #{pt}"
 		]
-		# TODO: REDIS
-		$standup_over = true
 	end
 
 	slack_message up_next.sample

@@ -25,6 +25,7 @@ def populate_all_users
 		end
 
 
+		# TODO: REDIS: laas:config:<TEAM_ID>:<CHANNEL_ID>:standup:excluded_users
 		$exclude_users = []
 		unless ENV['EXCLUDED_STANDUP_USERS'].nil?
 			$exclude_users = ENV['EXCLUDED_STANDUP_USERS'].split(",")
@@ -116,6 +117,7 @@ def standup
 	end
 end
 
+# TODO: REDIS
 $standup_over = false
 
 def standup_done
@@ -125,6 +127,7 @@ def standup_done
 	participants_skipped_key = "#{standup_key}:participants_skipped"
 
 	# Let user start the next standup with standup_next, if they wish
+	# TODO: REDIS
 	$standup_over = false
 	$redis.del( all_users_key )
 	message = ":boom: Standup Complete! :boom:"
@@ -161,6 +164,7 @@ def standup_start
 		standup_participants
 
 		# Standup has not finished yet
+		# TODO: REDIS
 		$standup_over = false
 
 		logger.debug "pasting standup participants"
@@ -199,6 +203,7 @@ def standup_start
 end
 
 # When did somebody last type /laas standup next?
+# TODO: REDIS
 $last_standup_next = nil
 $last_standup_participant = nil
 def standup_next
@@ -209,6 +214,7 @@ def standup_next
 
 	# Has nobody called standup_next yet?
 	# or has nobody called it in the past 2 seconds?
+	# TODO: REDIS
 	if $last_standup_next.nil? or ($last_standup_next + 2 < Time.now)
 		$last_standup_next = Time.now
 	else
@@ -216,6 +222,7 @@ def standup_next
 	end
 
 	# Is the standup already over?
+	# TODO: REDIS
 	if $standup_over
 		return standup_done
 	end
@@ -229,6 +236,7 @@ def standup_next
 	p = standup_participants.shift
 	$redis.set( participants_key, standup_participants.to_json )
 
+	# TODO: REDIS
 	$last_standup_participant = p
 	pt = "<@#{p['name']}|#{p['name']}>"
 
@@ -259,6 +267,7 @@ def standup_next
 			"And for our grand finale, #{pt}!",
 			"And last, but by no means least, #{pt}"
 		]
+		# TODO: REDIS
 		$standup_over = true
 	end
 
@@ -273,6 +282,7 @@ def standup_skip
 
 	# Has nobody called standup_next yet?
 	# or has nobody called it in the past 2 seconds?
+	# TODO: REDIS
 	if $last_standup_next.nil? or ($last_standup_next + 2 < Time.now)
 		# Because we're going to call standup_next afterwards, just unset this
 		$last_standup_next = nil

@@ -68,9 +68,6 @@ def standup_participants
 	all_users = JSON.parse($redis.get( all_users_key ))
 
 	# Extract just the usernames
-# 	$all_users.sort! do |a,b|
-# 		a['user']['real_name'] <=> b['user']['real_name']
-# 	end
 	all_users.shuffle!
 
 	standup_participants = []
@@ -159,17 +156,21 @@ def standup_start
 		sleep(0.1)
 		RestClient.post(params['response_url'], post_data )
 
-		second_response = "Running Order (Shuffled):"
-
 		# Get participants of this standup
+		logger.debug "getting standup participants"
 		standup_participants
 
 		# Standup has not finished yet
 		$standup_over = false
 
-		standup_participants = JSON.parse($redis.get( standup_participants_key ))
+		logger.debug "pasting standup participants"
+		standup_participants = JSON.parse($redis.get( participants_key ))
+
+		logger.debug "participants: #{standup_participants}"
 		standup_participants.each do |p|
 			pt = "<@#{p['name']}|#{p['name']}> - #{p['real_name']}"
+
+			second_response = "Running Order (Shuffled):"
 			second_response = second_response + "\n#{pt}"
 		end
 
@@ -219,7 +220,7 @@ def standup_next
 	end
 
 	# Was this standup started with "standup next"?
-	standup_participants = JSON.parse($redis.get( standup_participants_key ))
+	standup_participants = JSON.parse($redis.get( participants_key ))
 	if standup_participants.empty?
 		return standup_start
 	end

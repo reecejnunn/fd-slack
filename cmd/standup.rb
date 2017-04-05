@@ -129,7 +129,7 @@ def standup_done
 	$redis.del( all_users_key )
 	message = ":boom: Standup Complete! :boom:"
 
-	standup_participants_skipped = JSON.parse($redis.get( standup_participants_skipped_key ))
+	standup_participants_skipped = JSON.parse($redis.get( participants_skipped_key ))
 	unless standup_participants_skipped.empty?
 		message = message + "\n\nSkipped users:\n"
 
@@ -280,7 +280,7 @@ def standup_skip
 		return slack_secret_message "Slow down!\nYou can only run `standup skip` or `standup next` once every two seconds"
 	end
 
-	standup_participants_skipped = JSON.parse($redis.get( standup_participants_skipped_key ))
+	standup_participants_skipped = JSON.parse($redis.get( participants_skipped_key ))
 	standup_participants_skipped.push $last_standup_participant
 	$redis.set( participants_skipped_key, standup_participants_skipped.to_json )
 

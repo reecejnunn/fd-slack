@@ -204,6 +204,7 @@ def standup_next
 	participants_key = "#{standup_key}:participants"
 	participants_skipped_key = "#{standup_key}:participants_skipped"
 
+	logger.debug "standup_next called. last_standup_next = #{last_standup_next.inspect}"
 	# Has nobody called standup_next yet?
 	# or has nobody called it in the past 2 seconds?
 	# TODO: REDIS
@@ -214,10 +215,12 @@ def standup_next
 	end
 
 	# Is the standup already over?
-	if ( $redis.get( participants_key ).nil? )
-		return slack_message "No standup currently in progress!\nStart one with `/laas standup start`"
+	participants = $redis.get( participants_key )
+	logger.debug "participants = #{participants.inspect}"
+	if participants.nil?
+		return slack_message "No standup currently in progress in this channel\nStart one with `/laas standup start`"
 	else
-		standup_participants = JSON.parse($redis.get( participants_key ))
+		standup_participants = JSON.parse( participants )
 		logger.debug "participants remaining: #{standup_participants.count}"
 		if standup_participants.empty?
 			return standup_done

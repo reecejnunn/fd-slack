@@ -2,6 +2,9 @@
 def populate_all_users
 	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
 	all_users_key = "#{standup_key}:all_users"
+	participants_key = "#{standup_key}:participants"
+	participants_skipped_key = "#{standup_key}:participants_skipped"
+
 	all_users = $redis.get( all_users_key )
 	logger.debug "populate_all_users. all_users (#{all_users_key}) = #{all_users.inspect}"
 	if all_users.nil? || all_users == "" || all_users == {}
@@ -55,13 +58,13 @@ def populate_all_users
 end
 
 def standup_participants
-	populate_all_users
-
-	$standup_participants = []
-	$standup_participants_skipped = []
-
 	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
 	all_users_key = "#{standup_key}:all_users"
+	participants_key = "#{standup_key}:participants"
+	participants_skipped_key = "#{standup_key}:participants_skipped"
+
+	populate_all_users
+
 	all_users = JSON.parse($redis.get( all_users_key ))
 
 	# Extract just the usernames
@@ -70,14 +73,25 @@ def standup_participants
 # 	end
 	all_users.shuffle!
 
+	standup_participants = []
 	all_users.each do |user|
-		$standup_participants.push user['user']
+		standup_participants.push user['user']
 	end
+
+	# Store in DB
+	$redis.set( participants_key, standup_participants.to_json )
+	$redis.expire( participants_key, 60 * 30 )
+
+	$redis.set( participants_skipped_key, [].to_json )
+	$redis.expire( participants_skipped_key, 60 * 30 )
 
 end
 
 def standup
-	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
+	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
+	all_users_key = "#{standup_key}:all_users"
+	participants_key = "#{standup_key}:participants"
+	participants_skipped_key = "#{standup_key}:participants_skipped"
 
 	# TODO: allow slack delayed response for more of this
 	case params['text'].chomp
@@ -105,22 +119,24 @@ def standup
 	end
 end
 
-# TODO: allow per-channel standups
-$standup_participants = []
-$standup_participants_skipped = []
 $standup_over = false
 
 def standup_done
+	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
+	all_users_key = "#{standup_key}:all_users"
+	participants_key = "#{standup_key}:participants"
+	participants_skipped_key = "#{standup_key}:participants_skipped"
+
 	# Let user start the next standup with standup_next, if they wish
 	$standup_over = false
-	all_users_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}:all_users"
 	$redis.del( all_users_key )
 	message = ":boom: Standup Complete! :boom:"
 
-	unless $standup_participants_skipped.empty?
+	standup_participants_skipped = JSON.parse($redis.get( standup_participants_skipped_key ))
+	unless standup_participants_skipped.empty?
 		message = message + "\n\nSkipped users:\n"
 
-		$standup_participants_skipped.each do |p|
+		standup_participants_skipped.each do |p|
 			pt = "<@#{p['name']}|#{p['name']}> - #{p['real_name']}"
 			message = message + "#{pt}\n"
 		end
@@ -130,6 +146,11 @@ def standup_done
 end
 
 def standup_start
+	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
+	all_users_key = "#{standup_key}:all_users"
+	participants_key = "#{standup_key}:participants"
+	participants_skipped_key = "#{standup_key}:participants_skipped"
+
 
 	# TODO: all the below should be added to a Slack Message queue
 
@@ -146,7 +167,8 @@ def standup_start
 		# Standup has not finished yet
 		$standup_over = false
 
-		$standup_participants.each do |p|
+		standup_participants = JSON.parse($redis.get( standup_participants_key ))
+		standup_participants.each do |p|
 			pt = "<@#{p['name']}|#{p['name']}> - #{p['real_name']}"
 			second_response = second_response + "\n#{pt}"
 		end
@@ -178,6 +200,11 @@ end
 $last_standup_next = nil
 $last_standup_participant = nil
 def standup_next
+	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
+	all_users_key = "#{standup_key}:all_users"
+	participants_key = "#{standup_key}:participants"
+	participants_skipped_key = "#{standup_key}:participants_skipped"
+
 	# Has nobody called standup_next yet?
 	# or has nobody called it in the past 2 seconds?
 	if $last_standup_next.nil? or ($last_standup_next + 2 < Time.now)
@@ -192,11 +219,14 @@ def standup_next
 	end
 
 	# Was this standup started with "standup next"?
-	if $standup_participants.empty?
+	standup_participants = JSON.parse($redis.get( standup_participants_key ))
+	if standup_participants.empty?
 		return standup_start
 	end
 
-	p = $standup_participants.shift
+	p = standup_participants.shift
+	$redis.set( participants_key, standup_participants.to_json )
+
 	$last_standup_participant = p
 	pt = "<@#{p['name']}|#{p['name']}>"
 
@@ -219,7 +249,7 @@ def standup_next
 	]
 
 	# Last person
-	if $standup_participants.empty?
+	if standup_participants.empty?
 		up_next = [
 			"Finally, #{pt}",
 			"Lastly, #{pt}",
@@ -234,6 +264,11 @@ def standup_next
 end
 
 def standup_skip
+	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"
+	all_users_key = "#{standup_key}:all_users"
+	participants_key = "#{standup_key}:participants"
+	participants_skipped_key = "#{standup_key}:participants_skipped"
+
 	# Has nobody called standup_next yet?
 	# or has nobody called it in the past 2 seconds?
 	if $last_standup_next.nil? or ($last_standup_next + 2 < Time.now)
@@ -243,6 +278,9 @@ def standup_skip
 		return slack_secret_message "Slow down!\nYou can only run `standup skip` or `standup next` once every two seconds"
 	end
 
-	$standup_participants_skipped.push $last_standup_participant
+	standup_participants_skipped = JSON.parse($redis.get( standup_participants_skipped_key ))
+	standup_participants_skipped.push $last_standup_participant
+	$redis.set( participants_skipped_key, standup_participants_skipped.to_json )
+
 	standup_next
 end

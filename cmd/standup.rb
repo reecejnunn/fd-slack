@@ -166,11 +166,12 @@ def standup_start
 		logger.debug "pasting standup participants"
 		standup_participants = JSON.parse($redis.get( participants_key ))
 
-		logger.debug "participants: #{standup_participants}"
+		logger.debug "participants: #{standup_participants.inspect}"
+		second_response = "Running Order (Shuffled):"
 		standup_participants.each do |p|
+			logger.debug "participant: #{p.inspect}"
 			pt = "<@#{p['name']}|#{p['name']}> - #{p['real_name']}"
 
-			second_response = "Running Order (Shuffled):"
 			second_response = second_response + "\n#{pt}"
 		end
 

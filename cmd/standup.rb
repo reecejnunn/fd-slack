@@ -1,3 +1,26 @@
+# TODO LAAS-10: Refactor
+#
+# New Module: lmhd::laas
+# New Class:  Standup
+#
+# Class Methods:
+#	Standup.get( team, channel ),     returns Standup object or nil
+#	Standup.exists?( team, channel ), returns Bool
+#	Standup.new( team, channel ),     returns Standup object
+#		if Standup.exists? returns Standup.get
+#		populates participants
+#
+# Object Methods:
+# Unsure yet whether the object will post to slack, or if it will return strings
+# and have the Command object deal with posting to slack.
+# Probably the latter
+#
+#	standup.start
+#	standup.next
+#	standup.skip
+#	standup.done
+#	standup.reset
+
 
 def populate_all_users
 	standup_key = "laas:standup:#{params['team_id']}:#{params['channel_id']}"

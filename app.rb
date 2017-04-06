@@ -11,10 +11,6 @@
 # --- output method (stdout/stderr = default (in_channel, secret), or by specifying pair)
 # -- Maybe each command should be it's own class
 
-
-# TODO: Avatar (square)
-# i.e. just pick it from gravatar
-
 before do
 	# Based on http://stackoverflow.com/a/26675418
 	unless ( request.secure? || Sinatra::Application.environment != :production )

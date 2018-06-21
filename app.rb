@@ -39,10 +39,9 @@ post '/slack-slash' do
 				RestClient.post(params['response_url'], post_data )
 			}
 		when "say"
-			task = Thread.new {
-				post_data = slack_message( "*#{params['text'].split[1].upcase}* #{params['text'].split[2..-1].join(' ')}" )
-				RestClient.post(params['response_url'], post_data )
-			}
+			message_text = #{params['text'].split[2..-1].join(' ')}
+			user = #{params['text'].split[1].upcase}
+			slack_message_as!( message_text, user, params['channel_id'] )
 		else
 			slack_secret_message "I don't know what to do with: #{params['text'].split.first}"
 		end

@@ -35,14 +35,19 @@ def slack_message ( text )
 	})
 end
 
-def slack_message_as! ( text, uid, channel )
+def slack_message_as! ( text, user, channel )
+	case user
+	when "techops", "sd", "servicedesk"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/supportmale-512.png"
+	else
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
+	end
 	message_text = ERB::Util.url_encode(text)
-	user = Slack.users_info( :user => uid )
-	username = ERB::Util.url_encode(user['user']['real_name'])
-	icon_url = ERB::Util.url_encode(user['user']['profile']['image_192'])
+	username = ERB::Util.url_encode(user)
+	icon_url = ERB::Util.url_encode(image)
 
 	post_url = "https://slack.com/api/chat.postMessage?" +
-		"token=#{ENV["SLACK_API_TOKEN"]}" +
+		"token=#{ENV['SLACK_API_TOKEN']}" +
 		"&channel=#{channel}" +
 		"&username=#{username}" +
 		"&icon_url=#{icon_url}" +

@@ -16,7 +16,7 @@ end
 post '/slack-slash' do
 	logger.debug(__method__){ "New request: #{params.inspect}" }
 
-	unless from_slack?( params['team_id'], params['token'] )
+	unless from_slack?( params['token'] )
 		return slack_secret_message "Doesn't look like you're calling the API from Slack, buddy!"
 	end
 

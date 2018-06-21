@@ -14,8 +14,18 @@ def user_is_admin?( team_id, user_id )
 	return admins.include? user_id
 end
 
-def from_slack?( a, b )
-    return true
+def from_slack?( token )
+	logger.debug(__method__){ "Checking if Slack token is valid for this team" }
+	# i.e. did this request really come from Slack?
+
+	env_token = ENV['SLACK_API_TOKEN']
+
+	if env_token == token
+		return true
+	else
+		logger.error(__method__){ "Invalid token_from_Slack!" }
+		return false
+	end
 end
 
 def slack_message ( text )

@@ -24,6 +24,8 @@ post '/slack-slash' do
 		case params['text'].split.first
 		when "", nil
 			what_is_fd
+		when "wakeup"
+			slack_secret_message "OK! I'm up :zzz:"
 		when "help"
 			slack_secret_message help
 		when "start"

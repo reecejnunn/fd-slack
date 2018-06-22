@@ -43,7 +43,7 @@ def slack_message_as! ( text, user, channel )
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/female1-512.png"
 	when "director"
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png"
-	when "pagerduty"
+	when "pd", "pagerduty"
 		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"
 	when "nagios"
 		image = "https://a.slack-edge.com/7f1a0/plugins/nagios/assets/service_512.png"
@@ -63,7 +63,18 @@ def slack_message_as! ( text, user, channel )
 		"&as_user=false" +
 		"&text=#{message_text}"
 
-	RestClient.post(post_url)
+	RestClient.get(post_url)
+#	RestClient.post( url,
+#		{
+#			:token	=> "#{ENV['SLACK_API_TOKEN']}",
+#			:channel	=>	"#{channel}",
+#			:username	=>	"#{username}",
+#			:icon_url	=>	"#{icon_url}",
+#			:as_user	=>	"false",
+#			:text		=>	"#{message_text}"
+#		}
+#	)
+return false
 end
 
 def slack_secret_message ( text )

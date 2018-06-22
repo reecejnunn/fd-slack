@@ -42,6 +42,30 @@ post '/slack-slash' do
 			user = "#{params['text'].split[1]}"
 			message_text = "#{params['text'].split[2..-1].join(' ')}"
 			slack_message_as!( message_text, user, params['channel_id'] )
+		when "help"
+			def help
+					[
+"`/fd wakeup`"
+"This wakes up the bot if it's been unused for a while (other wise initial commands may time out and look not pretty)"
+""
+"`/fd start`"
+"Prints Firedrill *start*"
+""
+"`/fd stop`"
+"Prints Firedrill *stop*"
+""
+"`/fd say`"
+"Prints out a message from whichever role you want. Roles with custom profile pictures are slm, techops|sd|servicedesk, director, nagios, and pagerduty|pd. Any other role will use a generic picture."
+""
+"e.g. `/fd say techops there has been a major multi-blade failure in GUEA :scream:`"
+"e.g. `/fd say director Oi <@oliver>! Get some proper work done :shakefist:`"
+""
+"One word only for the role please otherwise it will use the second word of your role as the first word of your message"
+""
+"e.g. `/fd say random dev I am online` would show as 'RANDOM' saying 'dev I am online'"
+					].join("\n")
+			end
+			slack_secret_message help
 		else
 			slack_secret_message "I don't know what to do with: #{params['text'].split.first}"
 		end

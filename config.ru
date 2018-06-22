@@ -31,6 +31,8 @@ map "/" do
 	run Sinatra::Application
 end
 
+$stdout.sync = true
+
 # Cleanup task
 require 'logger'
 logger = Logger.new(STDOUT)

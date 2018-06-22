@@ -1,3 +1,6 @@
+require 'net/http'
+require 'uri'
+require 'json'
 
 def user_is_admin?( team_id, user_id )
 	logger.debug(__method__){ "Is #{user_id}@#{team_id} an admin of this LaaS instance?" }
@@ -50,37 +53,27 @@ def slack_message_as! ( text, user, channel )
 	else
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
 	end
-#	message_text = ERB::Util.url_encode(text)
-#	username = ERB::Util.url_encode(user.upcase!)
-#	icon_url = ERB::Util.url_encode(image)
-
-#	post_url = "https://slack.com/api/chat.postMessage?" +
-#		"token=#{ENV['SLACK_API_TOKEN_OTHER']}" +
-#		"&channel=#{channel}" +
-#		"&username=#{username}" +
-#		"&icon_url=#{icon_url}" +
-#		"&as_user=false" +
-#		"&text=#{message_text}"
-
-#	RestClient.get(post_url)
-	username = user
-	icon_url = image
 	
 	url = ENV['SLACK_WEBHOOK_URL']
-	RestClient.post( url,
-		{
-			:channel	=>	"#{channel}",
-			:username	=>	"#{username}",
-			:icon_url	=>	"#{icon_url}",
-			:as_user	=>	"false",
-			:text		=>	"#{text}"
-		},
-		{
-			content_type: :json,
-			accept: :json
-		}
-	)
-return false
+
+	uri = URI.parse(url)
+request = Net::HTTP::Post.new(uri)
+request.content_type = "application/json"
+request.body = JSON.dump({
+  "text" => text,
+  "username" => user.upcase!,
+  "icon_url" => image,
+	"channel" => channel
+})
+
+req_options = {
+  use_ssl: uri.scheme == "https",
+}
+
+response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+  http.request(request)
+end
+	
 end
 
 def slack_secret_message ( text )

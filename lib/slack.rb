@@ -50,9 +50,9 @@ def slack_message_as! ( text, user, channel )
 	else
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
 	end
-	print "#{user} #{image}"
+	print "User: #{user} Image: #{image} Text: #{text}"
 	message_text = ERB::Util.url_encode(text)
-	username = ERB::Util.url_encode(user)
+	username = ERB::Util.url_encode(user.upcase!)
 	icon_url = ERB::Util.url_encode(image)
 
 	post_url = "https://slack.com/api/chat.postMessage?" +
@@ -63,7 +63,7 @@ def slack_message_as! ( text, user, channel )
 		"&as_user=false" +
 		"&text=#{message_text}"
 
-	RestClient.get(post_url)
+	RestClient.post(post_url)
 end
 
 def slack_secret_message ( text )

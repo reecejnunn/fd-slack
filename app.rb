@@ -39,8 +39,8 @@ post '/slack-slash' do
 				RestClient.post(params['response_url'], post_data )
 			}
 		when "say"
-			user = #{params['text'].split[1]}\
-			message_text = #{params['text']}
+			user = "#{params['text'].split[1]}"
+			message_text = "#{params['text'].split[2..-1].join(' ')}"
 			slack_message_as!( message_text, user, params['channel_id'] )
 		else
 			slack_secret_message "I don't know what to do with: #{params['text'].split.first}"

@@ -39,8 +39,7 @@ post '/slack-slash' do
 				RestClient.post(params['response_url'], post_data )
 			}
 		when "say"
-			user = #{params['text'].split[1].upcase}
-		case user
+		case #{params['text'].split[1].downcase}
 			when "techops", "sd", "servicedesk"
 				image = "fd_support"
 			when "slm"
@@ -55,7 +54,7 @@ post '/slack-slash' do
 				image = "fd_other"
 		end
 			task = Thread.new {
-				post_data = slack_message( ":#{image}: *#{params['text'].split[1].upcase}:* #{params['text'].split[2..-1].join(' ')}" )
+				post_data = slack_message( ":#{image}: *#{params['text'].split[1].upcase}* #{params['text'].split[2..-1].join(' ')}" )
 				RestClient.post(params['response_url'], post_data )
 			}
 		else

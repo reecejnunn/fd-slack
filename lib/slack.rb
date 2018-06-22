@@ -28,6 +28,29 @@ def from_slack?( token )
 	end
 end
 
+def slack_message_fd ( text, user )
+	case user
+	when "techops", "sd", "servicedesk"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/supportmale-512.png"
+	when "slm"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/female1-512.png"
+	when "director"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png"
+	when "pagerduty"
+		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"
+	when "nagios"
+		image = "https://a.slack-edge.com/7f1a0/plugins/nagios/assets/service_512.png"
+	else
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
+	end
+	json ({
+		"response_type" => "in_channel",
+		"text"          => text,
+		"username"		=> user,
+		"icon_url"		=> image
+	})
+end
+
 def slack_message ( text )
 	json ({
 		"response_type" => "in_channel",
@@ -39,6 +62,14 @@ def slack_message_as! ( text, user, channel )
 	case user
 	when "techops", "sd", "servicedesk"
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/supportmale-512.png"
+	when "slm"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/female1-512.png"
+	when "director"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png"
+	when "pagerduty"
+		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"
+	when "nagios"
+		image = "https://a.slack-edge.com/7f1a0/plugins/nagios/assets/service_512.png"
 	else
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
 	end

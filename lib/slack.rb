@@ -50,7 +50,6 @@ def slack_message_as! ( text, user, channel )
 	else
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
 	end
-	print "User: #{user} Image: #{image} Text: #{text}"
 	message_text = ERB::Util.url_encode(text)
 	username = ERB::Util.url_encode(user.upcase!)
 	icon_url = ERB::Util.url_encode(image)
@@ -63,17 +62,19 @@ def slack_message_as! ( text, user, channel )
 		"&as_user=false" +
 		"&text=#{message_text}"
 
-	RestClient.get(post_url)
-#	RestClient.post( url,
-#		{
-#			:token	=> "#{ENV['SLACK_API_TOKEN']}",
-#			:channel	=>	"#{channel}",
-#			:username	=>	"#{username}",
-#			:icon_url	=>	"#{icon_url}",
-#			:as_user	=>	"false",
-#			:text		=>	"#{message_text}"
-#		}
-#	)
+#	RestClient.get(post_url)
+	url = "#{ENV['SLACK_WEBHOOK_URL']}"
+	print url
+	RestClient.post( url,
+		{
+			:channel	=>	"#{channel}",
+			:username	=>	"#{username}",
+			:icon_url	=>	"#{icon_url}",
+			:as_user	=>	"false",
+			:text		=>	"#{message_text}"
+		},
+		{content_type: :json, accept: :json}
+	)
 return false
 end
 

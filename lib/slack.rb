@@ -55,6 +55,8 @@ def slack_message_as! ( text, user, channel )
 	end
 	
 	url = ENV['SLACK_WEBHOOK_URL']
+	
+	print "#{params['user_name']} (#{params['user_id']}) asked #{user} to say #{text}"
 
 	uri = URI.parse(url)
 request = Net::HTTP::Post.new(uri)

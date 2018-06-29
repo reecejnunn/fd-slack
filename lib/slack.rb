@@ -50,6 +50,8 @@ def slack_message_as! ( text, user, channel )
 		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"
 	when "nagios"
 		image = "https://a.slack-edge.com/7f1a0/plugins/nagios/assets/service_512.png"
+	when "info"
+		image = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Info_Simple.svg/1024px-Info_Simple.svg.png"
 	else
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
 	end

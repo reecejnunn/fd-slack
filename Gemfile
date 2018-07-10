@@ -9,5 +9,6 @@ gem 'sinatra-json'
 gem 'dotenv'
 gem 'json'
 gem 'slack-api'
+gem 'rest-client'
 
 gem 'aws-sdk'

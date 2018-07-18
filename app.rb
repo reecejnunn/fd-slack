@@ -40,7 +40,7 @@ post '/slack-slash' do
 			}
 		when "say"
 			user = "#{params['text'].split[1]}"
-			message_text = "#{params['text'].split[2..-1].join(' ')}"
+			message_text = "#{params['text'].split[2..-1].join(' ')} (<!#{params['user_name']>)"
 			slack_message_as!( message_text, user, params['channel_id'] )
 		else
 			slack_secret_message "I don't know what to do with: #{params['text'].split.first}"

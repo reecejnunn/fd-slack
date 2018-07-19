@@ -29,15 +29,9 @@ post '/slack-slash' do
 		when "help"
 			slack_secret_message help
 		when "start"
-			task = Thread.new {
-				post_data = slack_message( "Firedrill *start*" )
-				RestClient.post(params['response_url'], post_data )
-			}
+			slack_message_as!( "Firedrill *start*", "FIREDRILL", params['channel_id'] )
 		when "stop"
-			task = Thread.new {
-				post_data = slack_message( "Firedrill *stop*" )
-				RestClient.post(params['response_url'], post_data )
-			}
+			slack_message_as!( "Firedrill *stop*", "FIREDRILL", params['channel_id'] )
 		when "say"
 			user = "#{params['text'].split[1]}"
 			message_text = "#{params['text'].split[2..-1].join(' ')}"

@@ -67,7 +67,7 @@ request = Net::HTTP::Post.new(uri)
 request.content_type = "application/json"
 request.body = JSON.dump({
   "text" => text,
-  "username" => user.upcase!,
+  "username" => user.upcase,
   "icon_url" => image,
 	"channel" => channel
 })

@@ -39,7 +39,7 @@ def slack_message ( text )
 end
 
 def slack_message_as! ( text, user, channel )
-	case user
+	case user.downcase
 	when "techops", "sd", "servicedesk"
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/supportmale-512.png"
 	when "slm"

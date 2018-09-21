@@ -44,7 +44,7 @@ def slack_message_as! ( text, user, channel )
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/supportmale-512.png"
 	when "slm"
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/female1-512.png"
-	when "director", "compliance"
+	when "director", "compliance", "stakeholder"
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png"
 	when "pd", "pagerduty"
 		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"

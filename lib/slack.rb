@@ -41,13 +41,11 @@ end
 def slack_message_as! ( text, user, channel )
 	case user.downcase
 	when "techops", "sd", "servicedesk"
-		image = "http://transcend-inc.com/wp-content/uploads/2012/11/helpdesk.jpg"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/supportmale-512.png"
 	when "slm"
-		image = "http://ptimes3.com/wp-content/uploads/2009/09/businesswoman.jpg"
-	when "director"
-		image = "http://www.constructionweekonline.com/pictures/TomBower_1.jpg"
-	when "compliance", "stakeholder"
-		image = "https://ak0.picdn.net/shutterstock/videos/13945856/thumb/1.jpg"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/female1-512.png"
+	when "director", "compliance", "stakeholder"
+		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png"
 	when "pd", "pagerduty"
 		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"
 	when "nagios"
@@ -59,7 +57,7 @@ def slack_message_as! ( text, user, channel )
 	when "twitter"
 		image = "https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/twitter_circle-512.png"
 	when "infra", "infrastructure"
-		image = "https://www.en.aau.dk/digitalAssets/251/251229_simonapedersen_featured-image.jpg"
+		image = "https://cdn0.iconfinder.com/data/icons/streamline-emoji-1/48/145-man-mechanic-1-512.png"
 	else
 		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
 	end

@@ -41,11 +41,11 @@ end
 def slack_message_as! ( text, user, channel )
 	case user.downcase
 	when "techops", "sd", "servicedesk"
-		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/supportmale-512.png"
+		image = "https://pbs.twimg.com/profile_images/3782204860/7cd22fe084f4ec791173cc3a056964c4_400x400.jpeg"
 	when "slm"
-		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/female1-512.png"
+		image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ2zXtFOQP39x-DQQL93UCkHAz0V2wFgSjL6arjIzctup0Bl7zRg"
 	when "director", "compliance", "stakeholder"
-		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/101/malecostume-512.png"
+		image = "http://signaturemale.com/wp-content/uploads/2013/06/352824-now-dial-a-suit-to-get-the-corporate-look.jpg"
 	when "pd", "pagerduty"
 		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"
 	when "nagios"
@@ -57,9 +57,9 @@ def slack_message_as! ( text, user, channel )
 	when "twitter"
 		image = "https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/twitter_circle-512.png"
 	when "infra", "infrastructure"
-		image = "https://cdn0.iconfinder.com/data/icons/streamline-emoji-1/48/145-man-mechanic-1-512.png"
+		image = "https://media.giphy.com/media/wLQYoBU5bOZ0c/giphy.gif"
 	else
-		image = "https://cdn1.iconfinder.com/data/icons/user-pictures/100/male3-512.png"
+		image = "https://stackoverflow.blog/wp-content/uploads/2017/02/8b9oX-e1497988302310.jpg"
 	end
 	
 	url = ENV['SLACK_WEBHOOK_URL']

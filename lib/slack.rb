@@ -50,14 +50,16 @@ def slack_message_as! ( text, user, channel )
 		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"
 	when "nagios"
 		image = "https://a.slack-edge.com/7f1a0/plugins/nagios/assets/service_512.png"
-  when "logs"
-    image = "https://png.icons8.com/color/180/magical-scroll.png"
+	when "logs"
+		image = "https://png.icons8.com/color/180/magical-scroll.png"
 	when "info"
 		image = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Info_Simple.svg/1024px-Info_Simple.svg.png"
 	when "twitter"
 		image = "https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/twitter_circle-512.png"
 	when "infra", "infrastructure"
 		image = "https://media.giphy.com/media/wLQYoBU5bOZ0c/giphy.gif"
+	when "dba"
+		image = "https://mentoryes.com/my/wp-content/uploads/2017/05/Database-Administrator.jpg"
 	else
 		image = "https://stackoverflow.blog/wp-content/uploads/2017/02/8b9oX-e1497988302310.jpg"
 	end

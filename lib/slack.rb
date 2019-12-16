@@ -40,9 +40,9 @@ end
 
 def slack_message_as! ( text, user, channel )
 	case user.downcase
-	when "techops", "sd", "servicedesk"
+	when "techops", "sd", "servicedesk", "techdesk"
 		image = "https://pbs.twimg.com/profile_images/3782204860/7cd22fe084f4ec791173cc3a056964c4_400x400.jpeg"
-	when "slm"
+	when "slm", "sla"
 		image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQZ2zXtFOQP39x-DQQL93UCkHAz0V2wFgSjL6arjIzctup0Bl7zRg"
 	when "director", "compliance", "stakeholder"
 		image = "http://signaturemale.com/wp-content/uploads/2013/06/352824-now-dial-a-suit-to-get-the-corporate-look.jpg"
@@ -50,20 +50,28 @@ def slack_message_as! ( text, user, channel )
 		image = "https://slack-files2.s3-us-west-2.amazonaws.com/avatars/2016-06-09/49671169684_cbdc45293ab75ea06413_512.png"
 	when "nagios"
 		image = "https://a.slack-edge.com/7f1a0/plugins/nagios/assets/service_512.png"
-  when "logs"
-    image = "https://png.icons8.com/color/180/magical-scroll.png"
+	when "logs"
+		image = "https://png.icons8.com/color/180/magical-scroll.png"
 	when "info"
 		image = "https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Info_Simple.svg/1024px-Info_Simple.svg.png"
 	when "twitter"
 		image = "https://cdn4.iconfinder.com/data/icons/social-media-icons-the-circle-set/48/twitter_circle-512.png"
 	when "infra", "infrastructure"
 		image = "https://media.giphy.com/media/wLQYoBU5bOZ0c/giphy.gif"
+  when "networks", "network"
+    image = "https://scholarblogs.emory.edu/lits/files/2019/10/gordon.png"
+  when "ncd"
+    image = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRluR6t4Xa1inosQ6ai1Rrzrb8pb9x-6_CzJ97gAJdBV46Tcbjq&s"
+  when "dba"
+    image = "https://www.de-cix.net/Files/6c970d8b2a24eefb0a7a5b48ceb39a83e578316d/KS.jpg"
+  when "trader"
+    image = "https://media.giphy.com/media/ohdY5OaQmUmVW/giphy.gif"
 	else
 		image = "https://stackoverflow.blog/wp-content/uploads/2017/02/8b9oX-e1497988302310.jpg"
 	end
-	
+
 	url = ENV['SLACK_WEBHOOK_URL']
-	
+
 	print "#{params['user_name']} (#{params['user_id']}) asked #{user} to say #{text}"
 
 	uri = URI.parse(url)
@@ -84,7 +92,7 @@ response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
   http.request(request)
 return false
 end
-	
+
 end
 
 def slack_secret_message ( text )
